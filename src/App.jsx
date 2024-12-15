@@ -1,38 +1,74 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { languages } from "./language";
 import "./index.css";
 import { clsx } from "clsx";
-function App() {
-  const [currentWord, setCurrentWord] = useState("react");
-  const [guessedWord, setGuessedWord] = useState([]);
-  const alphabet = "abcdefghijklmnopqrstuvwxyz";
 
+function App() {
+  // State to hold the currently selected word
+  const [currentWord, setCurrentWord] = useState("react");
+  
+  // State to hold guessed letters
+  const [guessedWord, setGuessedWord] = useState([]);
+  
+  // State to trigger a new game
+  const [hande, setHande] = useState(true);
+  
+  // Alphabet for the keyboard
+  const alphabet = "abcdefghijklmnopqrstuvwxyz.";
+
+  // Function to start a new game
+  function newGame() {
+    setHande(!hande); // Toggles the "hande" state to re-run the useEffect
+  }
+
+  // Get a random index from the languages array
+  let randomIndex = Math.floor(Math.random() * languages.length);
+
+  useEffect(() => {
+    // Set the current word to a randomly selected language name
+    setCurrentWord(languages[randomIndex].name);
+    setGuessedWord([]); // Reset the guessedWord array for the new game
+  }, [hande]); // Re-run whenever "hande" changes (new game triggered)
+
+  console.log(currentWord); // Log the current word for debugging
+
+  // Function to handle letter clicks
   function handleClick(alph) {
-    setGuessedWord((prevGussedWord) =>
-      !prevGussedWord.includes(alph)
-        ? [...prevGussedWord, alph]
-        : prevGussedWord
+    // Only add the letter to guessedWord if it hasn't been guessed already
+    setGuessedWord((prevGuessedWord) =>
+      prevGuessedWord.includes(alph) ? prevGuessedWord : [...prevGuessedWord, alph]
     );
   }
 
+  // Function to check if the current word contains uppercase letters
+  const isUpperCaseWord = currentWord.split("").some((char) => char === char.toUpperCase());
+
+  // Render the keyboard dynamically
   const keyboardElements = alphabet.split("").map((alph) => {
+    // Check if the letter has been guessed
     const isGuessed = guessedWord.includes(alph);
-    const isCorrectAlph = currentWord.includes(alph);
+    
+    // Check if the letter exists in the current word
+    const isCorrectAlph = currentWord.toLowerCase().includes(alph);
+
+    // Generate class names based on guess and correctness
     const className = clsx("keyboard", {
-    "correct-color": isGuessed && isCorrectAlph,
+      "correct-color": isGuessed && isCorrectAlph,
       "wrong-color": isGuessed && !isCorrectAlph,
     });
+
     return (
       <button
         key={alph}
         onClick={() => handleClick(alph)}
         className={className}
       >
-        {alph.toUpperCase()}
+        {isUpperCaseWord ? alph.toUpperCase() : alph.toLowerCase()}
       </button>
     );
   });
 
+  // Render the language chips
   const languageElements = languages.map((lang) => (
     <span
       key={lang.name}
@@ -46,11 +82,22 @@ function App() {
     </span>
   ));
 
-  const letterElements = currentWord.split("").map((letter) => (
-    <span key={letter} className="letter">
-      {letter}
-    </span>
-  ));
+  // Render the letters of the current word dynamically
+  const letterElements = currentWord.split("").map((letter, index) => {
+    // Check if the guessedWord includes the letter (case-insensitive)
+    const isCorrectWord = guessedWord.includes(letter.toLowerCase());
+
+    // Generate class names for styling
+    const className = clsx("letter", {
+      "remove-transparent": isCorrectWord,
+    });
+
+    return (
+      <span key={`${letter}-${index}`} className={className}>
+        {isCorrectWord ? letter : ""}
+      </span>
+    );
+  });
 
   return (
     <main>
@@ -68,7 +115,9 @@ function App() {
       <section className="language-chips">{languageElements}</section>
       <section className="word">{letterElements}</section>
       <section className="keyboard">{keyboardElements}</section>
-      <button className="new-game">New Game</button>
+      <button onClick={newGame} className="new-game">
+        New Game
+      </button>
     </main>
   );
 }
