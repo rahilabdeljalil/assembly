@@ -17,10 +17,10 @@ function App() {
 
   const keyboardElements = alphabet.split("").map((alph) => {
     const isGuessed = guessedWord.includes(alph);
-    const isCorrect = currentWord.includes(alph);
+    const isCorrectAlph = currentWord.includes(alph);
     const className = clsx("keyboard", {
-      "correct-color": isGuessed && isCorrect,
-      "wrong-color": isGuessed && !isCorrect,
+    "correct-color": isGuessed && isCorrectAlph,
+      "wrong-color": isGuessed && !isCorrectAlph,
     });
     return (
       <button
