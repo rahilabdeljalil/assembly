@@ -118,14 +118,30 @@ section.keyboard > button.wrong-color {
 }
 button.new-game {
   background-color: #11b5e5;
-  border: 1px solid #d7d7d7;
+  border: 1px solid #d7d7d72c;
   border-radius: 4px;
   width: 225px;
-  height: 40px;
+  height: 50px;
+  font-size: 25px;
+  padding: 6px 12px;
+  margin-bottom: 20px;
+  display: block;
+  margin-inline: auto;
+  cursor: pointer;
+  color: rgb(14, 13, 13);
+}
+button.need-help {
+  background-color: #190aa3;
+  border: 1px solid #d7d7d705;
+  border-radius: 4px;
+  width: 225px;
+  height: 50px;
+  font-size: 25px;
   padding: 6px 12px;
   display: block;
   margin-inline: auto;
   cursor: pointer;
+  color: white;
 }
 section.number-of-wrong-attempt {
 }
