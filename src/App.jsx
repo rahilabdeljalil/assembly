@@ -9,7 +9,8 @@ function App() {
     languages[Math.floor(Math.random() * languages.length)].name
   );
   const [guessedWord, setGuessedWord] = useState([]);
-  const [hande, setHande] = useState(true);
+  const [wrongLetters, setWrongLetters] = useState([]);
+  const [handle, setHandle] = useState(true);
 
   const alphabet = "abcdefghijklmnopqrstuvwxyz.";
 
@@ -22,13 +23,16 @@ function App() {
     (letter) => !currentWord.toLowerCase().includes(letter)
   );
 
+  const isLost = wrongGuessedLetters.length >= 5;
+
   const isUpperCaseWord = currentWord
     .split("")
     .some((char) => char === char.toUpperCase());
 
   // --- Event Handlers ---
   function newGame() {
-    setHande(!hande);
+    setHandle(!handle);
+    setWrongLetters([]);  // Reset wrong letters for the new game
   }
 
   function handleClick(alph) {
@@ -37,16 +41,23 @@ function App() {
         ? prevGuessedWord
         : [...prevGuessedWord, alph]
     );
+
+    if (!currentWord.toLowerCase().includes(alph)) {
+      setWrongLetters((prevWrongLetters) => [...prevWrongLetters, alph]);
+    }
   }
 
   function needHelp() {
     const randomIndex = Math.floor(Math.random() * currentWord.length);
-    const wordHelpdIn = currentWord[randomIndex].toLowerCase();
+    const wordHelpedIn = currentWord[randomIndex].toLowerCase();
 
-    if (!guessedWord.includes(wordHelpdIn)) {
-      handleClick(wordHelpdIn);
+    if (!guessedWord.includes(wordHelpedIn) && !wrongLetters.includes(wordHelpedIn)) {
+      handleClick(wordHelpedIn);
     } else {
-      needHelp();
+      // Prevent infinite recursion: If all letters have been guessed, do nothing
+      if (guessedWord.length + wrongLetters.length < currentWord.length) {
+        needHelp();
+      }
     }
   }
 
@@ -55,7 +66,8 @@ function App() {
     const randomIndex = Math.floor(Math.random() * languages.length);
     setCurrentWord(languages[randomIndex].name);
     setGuessedWord([]);
-  }, [hande]);
+    setWrongLetters([]); // Reset wrong letters for the new game
+  }, [handle]);
 
   // --- UI Generation: Keyboard ---
   const keyboardElements = alphabet.split("").map((alph) => {
@@ -71,7 +83,7 @@ function App() {
       <button
         key={alph}
         onClick={() => {
-          if (wrongGuessedLetters.length < 3) {
+          if (wrongGuessedLetters.length < 8) {
             handleClick(alph);
           } else {
             console.log(
@@ -111,13 +123,20 @@ function App() {
   // --- UI Generation: Word Display ---
   const letterElements = currentWord.split("").map((letter, index) => {
     const isCorrectWord = guessedWord.includes(letter.toLowerCase());
+    const isWrongLetter = wrongLetters.includes(letter.toLowerCase());
+
     const className = clsx("letter", {
       "remove-transparent": isCorrectWord,
+      "wrong-letter": isWrongLetter && isLost, // Apply red background only if game is lost
     });
 
     return (
       <span key={`${letter}-${index}`} className={className}>
-        {isCorrectWord ? letter : ""}
+        {isCorrectWord
+          ? letter
+          : isLost && isWrongLetter
+          ? letter // Show the wrong letter when game is lost
+          : ""}
       </span>
     );
   });
@@ -126,7 +145,7 @@ function App() {
   let gameStatus;
   if (isGameWon) {
     gameStatus = <p>You Win!</p>;
-  } else if (wrongGuessedLetters.length >= 3) {
+  } else if (isLost) {
     gameStatus = <p>You Lose!</p>;
   } else {
     gameStatus = <p>Enjoy the game</p>;
@@ -144,7 +163,7 @@ function App() {
       <header>
         <h1>Assembly: Endgame</h1>
         <p>
-          Guess the word within 3 attempts to keep the programming world safe
+          Guess the word within 5 attempts to keep the programming world safe
           from Assembly!
         </p>
       </header>

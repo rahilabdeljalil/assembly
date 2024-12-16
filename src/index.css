@@ -73,7 +73,6 @@ section.word {
   gap: 2px;
   margin-bottom: 20px;
 }
-
 section.word > .letter {
   height: 40px;
   width: 40px;
@@ -83,10 +82,50 @@ section.word > .letter {
   align-items: center;
   font-size: 1.125rem;
   border-bottom: 1px solid #f9f4da;
-  color: transparent; /* Make the letter invisible */
+  color: transparent; /* Initially hide the letter */
 }
+
 section.word > .remove-transparent {
+  color: white; /* Show the correct letter */
+}
+
+section.word > .wrong-letter {
+  background-color: red; /* Red background for wrong letters */
+  color: white; /* White text for wrong letters */
+  padding: 0px 8px; /* Adjust padding to prevent overflow */
+  margin: 2px; /* Adjust margin for better spacing */
+}
+
+section.word > .letter {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.125rem;
+  border-bottom: 1px solid #f9f4da;
+}
+
+section.word > .letter.remove-transparent {
   color: white;
+}
+
+section.word > .letter.wrong-letter {
+  background-color: red;
+  color: white;
+}
+
+section.number-of-wrong-attempt {
+  text-align: center;
+  margin: 10px 0;
+}
+
+section.p.number-of-wrong-attempts {
+  border: 1px solid white;
+  border-radius: 7px;
+  margin: 11px auto;
+  width: 65px;
+  font-size: 35px;
+  text-align: center;
+  padding: 20px;
 }
 
 section.keyboard {
